@@ -15,5 +15,9 @@ use Illuminate\Http\Request;
 
 
 Route::get('/pedidos/{conductor_id}', 'PedidoController@listado')->where('conductor_id', '[0-9]+');
+Route::get('/pedidos/{conductor_id}/{dia}-{mes}-{anno}', 'PedidoController@listado')->where('conductor_id', '[0-9]+')
+                                                                                    ->where('dia', '[0-9]+')
+                                                                                    ->where('mes', '[0-9]+')
+                                                                                    ->where('anno', '[0-9]+');
 
 Route::post('/pedido', 'PedidoController@nuevo');
