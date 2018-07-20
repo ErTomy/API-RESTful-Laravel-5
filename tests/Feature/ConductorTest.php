@@ -6,6 +6,9 @@ use Tests\TestCase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
+use DB;
+
+
 class ConductorTest extends TestCase
 {
     /**
@@ -14,57 +17,17 @@ class ConductorTest extends TestCase
      * @return void
      */
 
+    private function getToken(){
+        $conductor = DB::table('pedidos')->join('conductores', 'conductores.id', '=', 'pedidos.conductor_id')
+            ->select('conductores.token')
+            ->inRandomOrder()
+            ->limit(1)
+            ->get();
 
-    /* comprobación del listado de peticiones del dia actual para un conductor */
-    public function testListadoSinFecha()
-    {
-        $this->json('get', '/api/pedidos/2')
-            ->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => [
-                    0=>[
-                        'nombre',
-                        'apellidos',
-                        'email',
-                        'telefono',
-                        'direccion',
-                        'hora_desde',
-                        'hora_hasta',
-                    ]
-                ],
-            ]);
+        return (count($conductor) == 1)?$conductor[0]->token:null;
     }
 
 
-    /* comprobación del listado de peticiones de un día concreto para un conductor */
-    public function testListadoConFecha()
-    {
-        $this->json('get', '/api/pedidos/3/17-7-2018')
-            ->assertStatus(200)
-            ->assertJsonStructure([
-                'data' => [
-                    0=>[
-                        'nombre',
-                        'apellidos',
-                        'email',
-                        'telefono',
-                        'direccion',
-                        'hora_desde',
-                        'hora_hasta',
-                    ]
-                ],
-            ]);
-    }
-
-    /* comprobación de fallo en caso de mandar una fecha no válida */
-    public function testListadoFechaErronea()
-    {
-        $this->json('get', '/api/pedidos/2/30-20-2018')
-            ->assertStatus(422)
-            ->assertJson([
-                'message' => trans('mensajes.fecha_erronea'),
-            ]);
-    }
 
 
     /* comprobación del registro no mandando datos para comprobar que funciona la validación */
@@ -77,9 +40,9 @@ class ConductorTest extends TestCase
             ->assertJson([
                 'message'=>"The given data was invalid.",
                 'errors' => [
-                               'nombre'=>[trans('validation.required', ['attribute'=>'nombre'])],
-                               'apellidos'=>[trans('validation.required', ['attribute'=>'apellidos'])],
-                               'email'=>[trans('validation.required', ['attribute'=>'email'])],
+                    'nombre'=>[trans('validation.required', ['attribute'=>'nombre'])],
+                    'apellidos'=>[trans('validation.required', ['attribute'=>'apellidos'])],
+                    'email'=>[trans('validation.required', ['attribute'=>'email'])],
                 ]
             ]);
     }
@@ -105,6 +68,63 @@ class ConductorTest extends TestCase
                 'message' => trans('mensajes.peticion_registrada'),
             ]);
     }
+
+
+
+
+    /* comprobación del listado de peticiones del dia actual para un conductor */
+    public function testListadoSinFecha()
+    {
+        $this->json('get', '/api/pedidos/'.$this->getToken())
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    0=>[
+                        'nombre',
+                        'apellidos',
+                        'email',
+                        'telefono',
+                        'direccion',
+                        'hora_desde',
+                        'hora_hasta',
+                    ]
+                ],
+            ]);
+    }
+
+
+    /* comprobación del listado de peticiones de un día concreto para un conductor */
+    public function testListadoConFecha()
+    {
+        $this->json('get', '/api/pedidos/'.$this->getToken().'/'.date('d-m-Y'))
+            ->assertStatus(200)
+            ->assertJsonStructure([
+                'data' => [
+                    0=>[
+                        'nombre',
+                        'apellidos',
+                        'email',
+                        'telefono',
+                        'direccion',
+                        'hora_desde',
+                        'hora_hasta',
+                    ]
+                ],
+            ]);
+    }
+
+    /* comprobación de fallo en caso de mandar una fecha no válida */
+    public function testListadoFechaErronea()
+    {
+        $this->json('get', '/api/pedidos/'.$this->getToken().'/30-20-2018')
+            ->assertStatus(422)
+            ->assertJson([
+                'message' => trans('mensajes.fecha_erronea'),
+            ]);
+    }
+
+
+
 
 
 
