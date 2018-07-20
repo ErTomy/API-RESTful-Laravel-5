@@ -2,5 +2,6 @@
 
 return [
     'peticion_registrada'=>'Petición registrada',
-    'fecha_erronea'=>'formato de fecha no válido, debe indicarlo como d-m-Y'
+    'fecha_erronea'=>'formato de fecha no válido, debe indicarlo como d-m-Y',
+    'no_conductor'=>'No existe el conductor'
 ];

@@ -11,7 +11,6 @@ class Pedido extends Model
     protected $table = 'pedidos';
     protected $fillable = ['cliente_id', 'conductor_id', 'fecha_entrega', 'hora_desde', 'hora_hasta', 'direccion'];
 
-
     public function cliente()
     {
         return $this->belongsTo('App\Cliente');

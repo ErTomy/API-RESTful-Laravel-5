@@ -13,9 +13,13 @@ class ConductoresTableSeeder extends Seeder
     public function run()
     {
 
-        Conductor::create(['nombre' => 'Alberto', 'apellidos'=>'Álvarez']);
-        Conductor::create(['nombre' => 'Pepe', 'apellidos'=>'Perez']);
-        Conductor::create(['nombre' => 'Ramón', 'apellidos'=>'Rodríguez']);
+        $faker = Faker\Factory::create();
+        for ($i = 0; $i < 3; $i++) {
+            Conductor::create([
+                'nombre' => $faker->name,
+                'token'=>str_random(100)
+            ]);
+        }
 
     }
 

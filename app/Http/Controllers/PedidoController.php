@@ -39,9 +39,15 @@ class PedidoController extends Controller
     }
 
 
-    public function listado($conductor_id, $dia=null, $mes=null, $anno=null){
+    public function listado($token, $dia=null, $mes=null, $anno=null){
 
-        $pedidos = Pedido::where('conductor_id', $conductor_id);
+        $conductor = Conductor::whereToken($token)->first();
+
+        if(!$conductor){ // no existe el conductor
+            return response()->json(['message' => trans('mensajes.no_conductor')], 422);
+        }
+
+        $pedidos = Pedido::where('conductor_id', $conductor->id);
         if(is_null($dia)){
             $pedidos->hoy();
         }elseif(($fecha = strtotime("$anno-$mes-$dia")) !== false){
@@ -49,7 +55,6 @@ class PedidoController extends Controller
         }else{ // formato de fecha no válido
             return response()->json(['message' => trans('mensajes.fecha_erronea')], 422);
         }
-
 
         return PedidosResource::collection($pedidos->get());
     }
