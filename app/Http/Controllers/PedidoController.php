@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ApiPedidoRequest;
 use App\Http\Requests\PedidoRequest;
 use Illuminate\Http\Request;
 
+use App\Http\Resources\PedidoResource;
 use App\Http\Resources\PedidosResource;
 
 use App\Conductor;
@@ -13,8 +15,9 @@ use App\Pedido;
 
 class PedidoController extends Controller
 {
-
-    public function nuevo(PedidoRequest $request){
+    /******************************** funciones de la API  **********************************/
+    public function nuevo(ApiPedidoRequest $request)
+    {
         $cliente = Cliente::where('email', $request->input('email'))->first();
 
         if(!isset($cliente)){ // el cliente no esta registrado
@@ -39,8 +42,8 @@ class PedidoController extends Controller
     }
 
 
-    public function listado($token, $dia=null, $mes=null, $anno=null){
-
+    public function listado($token, $dia=null, $mes=null, $anno=null)
+    {
         $conductor = Conductor::whereToken($token)->first();
 
         if(!$conductor){ // no existe el conductor
@@ -57,6 +60,47 @@ class PedidoController extends Controller
         }
 
         return PedidosResource::collection($pedidos->get());
+    }
+
+
+
+    /**************************  funciones del panel ******************************/
+
+    public function index()
+    {
+        return view('home')->with('peticiones', Pedido::paginate(10))
+                                ->with('conductores', Conductor::orderBy('nombre')->get());
+    }
+
+
+    public function show($id)
+    {
+        $pedido = Pedido::find($id);
+        if($pedido){
+            return new PedidoResource($pedido);
+        }else{
+            return response()->json(['result'=>false, 'message'=>trans('panel.no_pedido')], 422);
+        }
+    }
+
+    public function action(PedidoRequest $request){
+
+        $pedido = Pedido::find($request->input('id'));
+
+        if(!$pedido) return response()->json(['result'=>false, 'message'=>trans('panel.no_pedido')], 422);
+
+        if ($request->input('accion') == 'delete'){
+            $pedido->delete();
+            return response()->json(['result'=>true, 'message'=>trans('panel.pedido_delete')]);
+        }else{
+            $pedido->direccion = $request->input('direccion');
+            $pedido->conductor_id = $request->input('conductor_id');
+            $pedido->fecha_entrega = $request->input('fecha_entrega');
+            $pedido->hora_desde = $request->input('hora_desde');
+            $pedido->hora_hasta = $request->input('hora_hasta');
+            $pedido->save();
+            return response()->json(['result'=>true, 'message'=>trans('panel.pedido_save')]);
+        }
     }
 
 }

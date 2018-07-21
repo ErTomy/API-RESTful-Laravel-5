@@ -14,3 +14,12 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Auth::routes();
+
+
+Route::group(['middleware' => 'auth'], function () {
+    Route::get('/home', 'PedidoController@index')->name('home');
+    Route::get('/peticion/{id}', 'PedidoController@show');
+    Route::post('/peticion', 'PedidoController@action')->name('accionPeticion');
+});

@@ -15,7 +15,7 @@ El pedido debe contener:
     <li>Teléfono/li>
     <li>Dirección de entrega (solo puede existir una por pedido)</li>
     <li>Fecha de entrega</li>
-    <li>Franja de hora seleccionada para la entrega (variable, pueden ser desde franjas de 1h hasta de 8h)</li>
+    <li>Franja de hora seleccionada para la entrega</li>
 </ul>
 Una vez tenemos guardada la información del pedido, debe asignarse a un driver que tengamos dado de alta en el sistema de forma aleatoria.
 </p>
@@ -23,3 +23,10 @@ Una vez tenemos guardada la información del pedido, debe asignarse a un driver 
 <p>
 Por otro lado, nuestros drivers mediante su aplicación, necesitan obtener el listado de tareas para completar en el día. Es necesario contar con un endpoint que reciba como parámetro el ID del driver y la fecha de los pedidos que queremos obtener y nos devuelva un JSON con el listado.  
 </p>
+
+
+
+
+<h3>Panel de administración</h3>
+
+<p>Se ha añadido un panel de administración donde despues de logarse se accede a un listado de las peticiones pudiendo modificarlas y borrarlas</p>
